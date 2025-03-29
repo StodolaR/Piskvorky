@@ -23,6 +23,7 @@ namespace Piskvorky
         private PlayBoardState pbState;
         private int noOfMoves;
         private const int fieldSize = 20;
+        private Button? lastButton;
         public PlayBoard()
         {
             InitializeComponent();
@@ -58,6 +59,11 @@ namespace Piskvorky
             if (!pbState.IsFree(X,Y)) return;
             noOfMoves++;
             int player;
+            field.FontWeight = FontWeights.Bold;
+            if (lastButton != null)
+            {
+                lastButton.FontWeight = FontWeights.Normal;
+            }
             if(noOfMoves % 2 == 0)
             {
                 field.Content = "O";
@@ -68,13 +74,21 @@ namespace Piskvorky
                 field.Content = "X";
                 player = 1;
             }
+            lastButton = field;
             bool win = pbState.EvaluateMove(X,Y, player);
             if (win)
             {
+                field.Foreground = Brushes.Red;
+                foreach (Button button in canBoard.Children)
+                {
+                    if(pbState.WinnerFields.Contains(button.Tag))
+                        button.Foreground = Brushes.Red;
+                }
                 MessageBox.Show($"Vyhrál Hráč{player}");
                 foreach (Button button in canBoard.Children)
                 {
                     button.Content = "";
+                    button.Foreground = Brushes.Black;
                 }
                 pbState.PlayboardReset();
                 noOfMoves = 0;

@@ -9,10 +9,12 @@ namespace Piskvorky
     internal class PlayBoardState
     {
         public int[,] PlayBoardFields { get; set; }
+        public List<string> WinnerFields { get; set; }
         public PlayBoardState()
         {
             PlayBoardFields = new int[20, 20];
             PlayboardReset();
+            WinnerFields = new List<string>();
         }
         public bool IsFree(int X, int Y)
         {
@@ -23,6 +25,7 @@ namespace Piskvorky
             PlayBoardFields[X, Y] = player;
             for (int direction = 0; direction < 4; direction++)
             {
+                WinnerFields.Clear();
                 int charsInRows = 1;
                 int directionX = 0;
                 int directionY = 0;
@@ -33,36 +36,25 @@ namespace Piskvorky
                     case 2: directionY = -1; break;
                     case 3: directionX = 1; directionY = -1; break;
                 }
-                for (int shift = 1; shift <= 4; shift++)
+                for (int orientation = -1; orientation <= 1; orientation+=2)
                 {
-                    int shiftX = shift * directionX;
-                    int shiftY = shift * directionY;
-                    if (X - shiftX >= 0 && X - shiftX < PlayBoardFields.GetLength(0) 
-                        && Y - shiftY >= 0 && Y - shiftY < PlayBoardFields.GetLength(1))
+                    for (int shift = 1; shift < 5; shift++)
                     {
-                        if (PlayBoardFields[X - shiftX, Y - shiftY] == player)
+                        int shiftX = shift * directionX * orientation;
+                        int shiftY = shift * directionY * orientation;
+                        if (X + shiftX >= 0 && X + shiftX < PlayBoardFields.GetLength(0)
+                            && Y + shiftY >= 0 && Y + shiftY < PlayBoardFields.GetLength(1))
                         {
-                            charsInRows++;
+                            if (PlayBoardFields[X + shiftX, Y + shiftY] == player)
+                            {
+                                charsInRows++;
+                                WinnerFields.Add((X + shiftX).ToString() + "," + (Y + shiftY).ToString());
+                            }
+                            else break;
                         }
                         else break;
                     }
-                    else break;
-                }
-                for (int shift = 1; shift < 5; shift++)
-                {
-                    int shiftX = shift * directionX;
-                    int shiftY = shift * directionY;
-                    if (X + shiftX >= 0 && X + shiftX < PlayBoardFields.GetLength(0)
-                        && Y + shiftY >= 0 && Y + shiftY < PlayBoardFields.GetLength(1))
-                    {
-                        if (PlayBoardFields[X + shiftX, Y+ shiftY] == player)
-                        {
-                            charsInRows++;
-                        }
-                        else break;
-                    }
-                    else break;
-                }
+                }               
                 if (charsInRows >= 5)
                     return true;               
             }
