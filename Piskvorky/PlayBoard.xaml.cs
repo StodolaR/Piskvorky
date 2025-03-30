@@ -21,14 +21,12 @@ namespace Piskvorky
     public partial class PlayBoard : UserControl
     {
         private PlayBoardState pbState;
-        private int noOfMoves;
         private const int fieldSize = 20;
         private Button? lastButton;
         public PlayBoard()
         {
             InitializeComponent();
             pbState = new PlayBoardState();
-            noOfMoves = 0;
             InsertFields(canBoard);
         }
         private void InsertFields(Canvas board)
@@ -57,23 +55,14 @@ namespace Piskvorky
             int X = int.Parse(coordinates[0]);
             int Y = int.Parse(coordinates[1]);
             if (!pbState.IsFree(X,Y)) return;
-            noOfMoves++;
             int player;
             field.FontWeight = FontWeights.Bold;
             if (lastButton != null)
             {
                 lastButton.FontWeight = FontWeights.Normal;
             }
-            if(noOfMoves % 2 == 0)
-            {
-                field.Content = "O";
-                player = 2;
-            }
-            else
-            {
-                field.Content = "X";
-                player = 1;
-            }
+            field.Content = "X";
+            player = 1;
             lastButton = field;
             bool win = pbState.EvaluateMove(X,Y, player);
             if (win)
@@ -91,7 +80,42 @@ namespace Piskvorky
                     button.Foreground = Brushes.Black;
                 }
                 pbState.PlayboardReset();
-                noOfMoves = 0;
+                return;
+            }
+            foreach (Button compField in canBoard.Children)
+            {
+                if (pbState.GetBestScoreField().Equals(compField.Tag))
+                {
+                    coordinates = ((string)compField.Tag).Split(',');
+                    X = int.Parse(coordinates[0]);
+                    Y = int.Parse(coordinates[1]);
+                    compField.FontWeight = FontWeights.Bold;
+                    if (lastButton != null)
+                    {
+                        lastButton.FontWeight = FontWeights.Normal;
+                    }
+                    compField.Content = "O";
+                    player = 2;
+                    lastButton = compField;
+                    win = pbState.EvaluateMove(X, Y, player);
+                    if (win)
+                    {
+                        field.Foreground = Brushes.Red;
+                        foreach (Button button in canBoard.Children)
+                        {
+                            if (pbState.WinnerFields.Contains(button.Tag))
+                                button.Foreground = Brushes.Red;
+                        }
+                        MessageBox.Show($"Vyhrál Hráč{player}");
+                        foreach (Button button in canBoard.Children)
+                        {
+                            button.Content = "";
+                            button.Foreground = Brushes.Black;
+                        }
+                        pbState.PlayboardReset();
+                    }
+                    break;
+                }
             }
         }
 
@@ -102,7 +126,7 @@ namespace Piskvorky
             {
                 for (int i = 0; i < pbState.PlayBoardFields.GetLength(0); i++)
                 {
-                    scoreBoardBuild.AppendFormat("{0,3}", pbState.PlayBoardFields[i,j]);
+                    scoreBoardBuild.AppendFormat("{0,5}", pbState.PlayBoardFields[i,j]);
                 }
                 scoreBoardBuild.Append(Environment.NewLine);
             }
