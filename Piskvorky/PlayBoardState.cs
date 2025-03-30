@@ -12,6 +12,7 @@ namespace Piskvorky
         public List<string> WinnerFields { get; set; }
         public List<(int, int)> RecalcFields { get; set; }
         public List<string> BestScoreFields { get; set; }
+        public int[,] DirectionCoords { get; set; }
         public PlayBoardState()
         {
             PlayBoardFields = new int[20, 20];
@@ -19,6 +20,7 @@ namespace Piskvorky
             WinnerFields = new List<string>();
             RecalcFields = new List<(int,int)>();
             BestScoreFields = new List<string>();
+            DirectionCoords = new int[4, 2] { {-1,0}, {-1,-1}, {0,-1},{1,-1} };
         }
         public bool IsFree(int X, int Y)
         {
@@ -32,22 +34,13 @@ namespace Piskvorky
             {
                 WinnerFields.Clear();
                 int charsInRows = 1;
-                int directionX = 0;
-                int directionY = 0;
-                switch (direction)
-                {
-                    case 0: directionX = -1; break;
-                    case 1: directionX = -1; directionY = -1; break;
-                    case 2: directionY = -1; break;
-                    case 3: directionX = 1; directionY = -1; break;
-                }
                 for (int orientation = -1; orientation <= 1; orientation+=2)
                 {
                     bool isInRows = true;
                     for (int shift = 1; shift < 5; shift++)
                     {                       
-                        int shiftX = shift * directionX * orientation;
-                        int shiftY = shift * directionY * orientation;
+                        int shiftX = shift * DirectionCoords[direction,0] * orientation;
+                        int shiftY = shift * DirectionCoords[direction,1] * orientation;
                         if (X + shiftX >= 0 && X + shiftX < PlayBoardFields.GetLength(0)
                             && Y + shiftY >= 0 && Y + shiftY < PlayBoardFields.GetLength(1))
                         {
@@ -85,27 +78,16 @@ namespace Piskvorky
                 int fieldScore = 3;
                 for (int direction = 0; direction < 4; direction++)
                 {
-                    int directionX = 0;
-                    int directionY = 0;
                     int playersInRow = 0;
                     int computersInRow = 0;
-                    switch (direction)
-                    {
-                        case 0: directionX = -1; break;
-                        case 1: directionX = -1; directionY = -1; break;
-                        case 2: directionY = -1; break;
-                        case 3: directionX = 1; directionY = -1; break;
-                    }
                     for (int orientation = -1; orientation <= 1; orientation += 2)
                     {
                         bool playerInRow = true;
                         bool computerInRow = true;
-                        //bool block = false;
-                        //int last = free;
                         for (int shift = 1; shift < 5; shift++)
                         {
-                            int shiftX = shift * directionX * orientation;
-                            int shiftY = shift * directionY * orientation;
+                            int shiftX = shift * DirectionCoords[direction, 0] * orientation;
+                            int shiftY = shift * DirectionCoords[direction, 1] * orientation;
                             if (X + shiftX >= 0 && X + shiftX < PlayBoardFields.GetLength(0)
                                 && Y + shiftY >= 0 && Y + shiftY < PlayBoardFields.GetLength(1))
                             {
@@ -114,23 +96,12 @@ namespace Piskvorky
                                 {
                                     playersInRow++;
                                     computerInRow = false;
-                                    //last = player;
                                 }
                                 else if (PlayBoardFields[X + shiftX, Y + shiftY] == computer && computerInRow)
                                 {
                                     computersInRow++;
                                     playerInRow = false;
-                                    //last = computer;
                                 }
-                                //else
-                                //{
-                                //    if ((last == player && PlayBoardFields[X + shiftX, Y + shiftY] == computer)
-                                //        || (last == computer && PlayBoardFields[X + shiftX, Y + shiftY] == player))
-                                //    {
-                                //        //block = true;
-                                //    }
-                                //    last = free;
-                                //}
                                 if (PlayBoardFields[X + shiftX, Y + shiftY] > 2)
                                 {
                                     playerInRow = false;
@@ -139,7 +110,6 @@ namespace Piskvorky
                             }
                             else
                             {
-                                //block = true;
                                 break;
                             }
                         }
@@ -149,14 +119,14 @@ namespace Piskvorky
                         case 1: fieldScore += 7; break;
                         case 2: fieldScore += 32;break;
                         case 3: fieldScore += 140; break;
-                        case 4: fieldScore += 399; break;
+                        case 4: fieldScore += 500; break;
                     }
                     switch (computersInRow)
                     {
                         case 1: fieldScore += 6; break;
                         case 2: fieldScore += 33; break;
-                        case 3: fieldScore += 141; break;
-                        case 4: fieldScore += 400; break;
+                        case 3: fieldScore += 600; break;
+                        case 4: fieldScore += 2000; break;
                     }
                 }
                 PlayBoardFields[X,Y] = fieldScore;
