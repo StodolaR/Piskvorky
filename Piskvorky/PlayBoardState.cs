@@ -7,13 +7,11 @@ using System.Threading.Tasks;
 namespace Piskvorky
 {
     internal class PlayBoardState
-    {
-        //private int[] points; 
+    { 
         public int[,] PlayBoardFields { get; set; }
         public List<string> WinnerFields { get; set; }
         public List<(int, int)> RecalcFields { get; set; }
         public List<string> BestScoreFields { get; set; }
-        //public string BestScoreField { get; set; }
         public PlayBoardState()
         {
             PlayBoardFields = new int[20, 20];
@@ -21,7 +19,6 @@ namespace Piskvorky
             WinnerFields = new List<string>();
             RecalcFields = new List<(int,int)>();
             BestScoreFields = new List<string>();
-            //points = new int[] { 0, 4, 5, 6, 7, 30, 31, 32, 33, 140, 141, 142, 143 };
         }
         public bool IsFree(int X, int Y)
         {
@@ -81,7 +78,6 @@ namespace Piskvorky
         {
             int player = 1;
             int computer = 2;
-            //int free = 3;
             foreach (var recalcField in RecalcFields)
             {
                 int X = recalcField.Item1;

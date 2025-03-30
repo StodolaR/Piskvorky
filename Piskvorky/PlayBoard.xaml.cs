@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,6 +24,8 @@ namespace Piskvorky
         private PlayBoardState pbState;
         private const int fieldSize = 20;
         private Button? lastButton;
+        private const int human = 1;
+        private const int computer = 2;
         public PlayBoard()
         {
             InitializeComponent();
@@ -50,75 +53,63 @@ namespace Piskvorky
         }
         private void Field_Click(object sender, RoutedEventArgs e)
         {
-            Button field = (Button)sender;
-            string[] coordinates = ((string)field.Tag).Split(',');
+            Button humanField = (Button)sender;
+            string[] coordinates = ((string)humanField.Tag).Split(',');
             int X = int.Parse(coordinates[0]);
             int Y = int.Parse(coordinates[1]);
-            if (!pbState.IsFree(X,Y)) return;
-            int player;
-            field.FontWeight = FontWeights.Bold;
-            if (lastButton != null)
-            {
-                lastButton.FontWeight = FontWeights.Normal;
-            }
-            field.Content = "X";
-            player = 1;
-            lastButton = field;
-            bool win = pbState.EvaluateMove(X,Y, player);
+            if (!pbState.IsFree(X, Y)) return;
+            bool win = ProcessingMove(humanField, "X", human, X, Y);
             if (win)
             {
-                field.Foreground = Brushes.Red;
-                foreach (Button button in canBoard.Children)
-                {
-                    if(pbState.WinnerFields.Contains(button.Tag))
-                        button.Foreground = Brushes.Red;
-                }
-                MessageBox.Show($"Vyhrál Hráč{player}");
-                foreach (Button button in canBoard.Children)
-                {
-                    button.Content = "";
-                    button.Foreground = Brushes.Black;
-                }
-                pbState.PlayboardReset();
+                AnnounceWin(humanField, human);
                 return;
             }
+            string bestScoreField = pbState.GetBestScoreField();
             foreach (Button compField in canBoard.Children)
             {
-                if (pbState.GetBestScoreField().Equals(compField.Tag))
+                if (compField.Tag.Equals(bestScoreField))
                 {
                     coordinates = ((string)compField.Tag).Split(',');
                     X = int.Parse(coordinates[0]);
                     Y = int.Parse(coordinates[1]);
-                    compField.FontWeight = FontWeights.Bold;
-                    if (lastButton != null)
-                    {
-                        lastButton.FontWeight = FontWeights.Normal;
-                    }
-                    compField.Content = "O";
-                    player = 2;
-                    lastButton = compField;
-                    win = pbState.EvaluateMove(X, Y, player);
+                    win = ProcessingMove(compField, "O", computer, X, Y);
                     if (win)
                     {
-                        field.Foreground = Brushes.Red;
-                        foreach (Button button in canBoard.Children)
-                        {
-                            if (pbState.WinnerFields.Contains(button.Tag))
-                                button.Foreground = Brushes.Red;
-                        }
-                        MessageBox.Show($"Vyhrál Hráč{player}");
-                        foreach (Button button in canBoard.Children)
-                        {
-                            button.Content = "";
-                            button.Foreground = Brushes.Black;
-                        }
-                        pbState.PlayboardReset();
+                        AnnounceWin(compField, computer);
                     }
                     break;
                 }
             }
         }
-
+        private bool ProcessingMove(Button field, string mark, int player, int X, int Y)
+        {
+            
+            field.FontWeight = FontWeights.Bold;
+            if (lastButton != null)
+            {
+                lastButton.FontWeight = FontWeights.Normal;
+            }
+            field.Content = mark;
+            lastButton = field;
+            bool isWin = pbState.EvaluateMove(X, Y, player);
+            return isWin;
+        }
+        private void AnnounceWin(Button field, int player)
+        {
+            field.Foreground = Brushes.Red;
+            foreach (Button button in canBoard.Children)
+            {
+                if (pbState.WinnerFields.Contains(button.Tag))
+                    button.Foreground = Brushes.Red;
+            }
+            MessageBox.Show($"Vyhrál Hráč{player}");
+            foreach (Button button in canBoard.Children)
+            {
+                button.Content = "";
+                button.Foreground = Brushes.Black;
+            }
+            pbState.PlayboardReset();
+        }
         private void btnStav_Click(object sender, RoutedEventArgs e)
         {
             StringBuilder scoreBoardBuild = new StringBuilder(); 
