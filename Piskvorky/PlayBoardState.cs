@@ -13,9 +13,11 @@ namespace Piskvorky
         public List<(int, int)> RecalcFields { get; set; }
         public List<string> BestScoreFields { get; set; }
         public int[,] DirectionCoords { get; set; }
+        public const int human = 1;
+        public const int computer = 2;
         public PlayBoardState()
         {
-            PlayBoardFields = new int[20, 20];
+            PlayBoardFields = new int[15, 15];
             PlayboardReset();
             WinnerFields = new List<string>();
             RecalcFields = new List<(int,int)>();
@@ -63,14 +65,12 @@ namespace Piskvorky
                 }               
                 if (charsInRows >= 5)
                     return true;
-                RecalculateFields();
             }
+            RecalculateFields();
             return false;
         }
         private void RecalculateFields()
         {
-            int player = 1;
-            int computer = 2;
             foreach (var recalcField in RecalcFields)
             {
                 int X = recalcField.Item1;
@@ -78,11 +78,11 @@ namespace Piskvorky
                 int fieldScore = 3;
                 for (int direction = 0; direction < 4; direction++)
                 {
-                    int playersInRow = 0;
+                    int humansInRow = 0;
                     int computersInRow = 0;
                     for (int orientation = -1; orientation <= 1; orientation += 2)
                     {
-                        bool playerInRow = true;
+                        bool humanInRow = true;
                         bool computerInRow = true;
                         for (int shift = 1; shift < 5; shift++)
                         {
@@ -92,20 +92,19 @@ namespace Piskvorky
                                 && Y + shiftY >= 0 && Y + shiftY < PlayBoardFields.GetLength(1))
                             {
                                 //podminky
-                                if (PlayBoardFields[X + shiftX, Y + shiftY] == player && playerInRow)
+                                if (PlayBoardFields[X + shiftX, Y + shiftY] == human && humanInRow)
                                 {
-                                    playersInRow++;
+                                    humansInRow++;
                                     computerInRow = false;
                                 }
                                 else if (PlayBoardFields[X + shiftX, Y + shiftY] == computer && computerInRow)
                                 {
                                     computersInRow++;
-                                    playerInRow = false;
+                                    humanInRow = false;
                                 }
-                                if (PlayBoardFields[X + shiftX, Y + shiftY] > 2)
+                                else
                                 {
-                                    playerInRow = false;
-                                    computerInRow = false;
+                                    break;
                                 }
                             }
                             else
@@ -114,7 +113,7 @@ namespace Piskvorky
                             }
                         }
                     }
-                    switch (playersInRow)
+                    switch (humansInRow)
                     {
                         case 1: fieldScore += 7; break;
                         case 2: fieldScore += 32;break;

@@ -24,8 +24,6 @@ namespace Piskvorky
         private PlayBoardState pbState;
         private const int fieldSize = 20;
         private Button? lastButton;
-        private const int human = 1;
-        private const int computer = 2;
         public PlayBoard()
         {
             InitializeComponent();
@@ -58,10 +56,10 @@ namespace Piskvorky
             int X = int.Parse(coordinates[0]);
             int Y = int.Parse(coordinates[1]);
             if (!pbState.IsFree(X, Y)) return;
-            bool win = ProcessingMove(humanField, "X", human, X, Y);
+            bool win = ProcessingMove(humanField, "X", PlayBoardState.human, X, Y);
             if (win)
             {
-                AnnounceWin(humanField, human);
+                AnnounceWin(humanField, PlayBoardState.human);
                 return;
             }
             string bestScoreField = pbState.GetBestScoreField();
@@ -72,10 +70,10 @@ namespace Piskvorky
                     coordinates = ((string)compField.Tag).Split(',');
                     X = int.Parse(coordinates[0]);
                     Y = int.Parse(coordinates[1]);
-                    win = ProcessingMove(compField, "O", computer, X, Y);
+                    win = ProcessingMove(compField, "O", PlayBoardState.computer, X, Y);
                     if (win)
                     {
-                        AnnounceWin(compField, computer);
+                        AnnounceWin(compField, PlayBoardState.computer);
                     }
                     break;
                 }

@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Canvas x:Name="canBoard"/>
+        <Canvas x:Name="canBoard" />
         <Button x:Name="btnStav" Content="Stav" HorizontalAlignment="Right" VerticalAlignment="Top" Click="btnStav_Click"/>
     </Grid>
 </UserControl>
