@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,42 +32,50 @@ namespace Piskvorky
         public bool EvaluateMove(int X, int Y, int player)
         {
             PlayBoardFields[X, Y] = player;
+            bool IsWinner = CheckWin(X,Y,player);
+            if (!IsWinner)
+            {
+                RecalculateFields();
+            }            
+            return IsWinner;
+        }
+        private bool CheckWin(int X, int Y, int player)
+        {
             RecalcFields.Clear();
             for (int direction = 0; direction < 4; direction++)
             {
                 WinnerFields.Clear();
-                int charsInRows = 1;
-                for (int orientation = -1; orientation <= 1; orientation+=2)
+                int charsInRow = 1;
+                for (int orientation = -1; orientation <= 1; orientation += 2)
                 {
-                    bool isInRows = true;
+                    bool isInRow = true;
                     for (int shift = 1; shift < 5; shift++)
-                    {                       
-                        int shiftX = shift * DirectionCoords[direction,0] * orientation;
-                        int shiftY = shift * DirectionCoords[direction,1] * orientation;
+                    {
+                        int shiftX = shift * DirectionCoords[direction, 0] * orientation;
+                        int shiftY = shift * DirectionCoords[direction, 1] * orientation;
                         if (X + shiftX >= 0 && X + shiftX < PlayBoardFields.GetLength(0)
                             && Y + shiftY >= 0 && Y + shiftY < PlayBoardFields.GetLength(1))
                         {
-                            if (PlayBoardFields[X + shiftX, Y + shiftY] == player && isInRows==true)
+                            if (PlayBoardFields[X + shiftX, Y + shiftY] == player && isInRow == true)
                             {
-                                charsInRows++;
+                                charsInRow++;
                                 WinnerFields.Add((X + shiftX).ToString() + "," + (Y + shiftY).ToString());
                             }
                             else
                             {
-                                isInRows = false;
+                                isInRow = false;
                             }
                             if (PlayBoardFields[X + shiftX, Y + shiftY] > 2)
                             {
-                                RecalcFields.Add( new (X + shiftX, Y + shiftY));
+                                RecalcFields.Add(new(X + shiftX, Y + shiftY));
                             }
                         }
                         else break;
                     }
-                }               
-                if (charsInRows >= 5)
+                }
+                if (charsInRow >= 5)
                     return true;
             }
-            RecalculateFields();
             return false;
         }
         private void RecalculateFields()
@@ -102,34 +111,34 @@ namespace Piskvorky
                                     computersInRow++;
                                     humanInRow = false;
                                 }
-                                else
-                                {
-                                    break;
-                                }
+                                else break;
                             }
-                            else
-                            {
-                                break;
-                            }
+                            else break;
                         }
                     }
-                    switch (humansInRow)
-                    {
-                        case 1: fieldScore += 7; break;
-                        case 2: fieldScore += 32;break;
-                        case 3: fieldScore += 140; break;
-                        case 4: fieldScore += 500; break;
-                    }
-                    switch (computersInRow)
-                    {
-                        case 1: fieldScore += 6; break;
-                        case 2: fieldScore += 33; break;
-                        case 3: fieldScore += 600; break;
-                        case 4: fieldScore += 2000; break;
-                    }
+                    fieldScore = EvaluateFieldScore(humansInRow, computersInRow, fieldScore);
                 }
                 PlayBoardFields[X,Y] = fieldScore;
             }
+        }
+        private int EvaluateFieldScore(int humansInRow,  int computersInRow, int fieldScore)
+        {
+
+            switch (humansInRow)
+            {
+                case 1: fieldScore += 7; break;
+                case 2: fieldScore += 32; break;
+                case 3: fieldScore += 140; break;
+                case 4: fieldScore += 500; break;
+            }
+            switch (computersInRow)
+            {
+                case 1: fieldScore += 6; break;
+                case 2: fieldScore += 33; break;
+                case 3: fieldScore += 600; break;
+                case 4: fieldScore += 2000; break;
+            }
+            return fieldScore;
         }
         public string GetBestScoreField()
         {
