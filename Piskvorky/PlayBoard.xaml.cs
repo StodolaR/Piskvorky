@@ -24,6 +24,7 @@ namespace Piskvorky
         private PlayBoardState pbState;
         private const int fieldSize = 20;
         private Button? lastButton;
+        private bool humanWin = false;
         public PlayBoard()
         {
             InitializeComponent();
@@ -41,7 +42,8 @@ namespace Piskvorky
                         Height = fieldSize,
                         Width = fieldSize,
                     };
-                    field.Click += Field_Click;
+                    field.PreviewMouseDown += Field_PreviewMouseDown;
+                    field.PreviewMouseUp += Field_PreviewMouseUp;
                     field.Tag = i + "," + j;
                     board.Children.Add(field);
                     Canvas.SetLeft(field, i * fieldSize);
@@ -49,7 +51,8 @@ namespace Piskvorky
                 }
             }
         }
-        private void Field_Click(object sender, RoutedEventArgs e)
+
+        private void Field_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             Button humanField = (Button)sender;
             string[] coordinates = ((string)humanField.Tag).Split(',');
@@ -60,25 +63,35 @@ namespace Piskvorky
             if (win)
             {
                 AnnounceWin(humanField, PlayBoardState.human);
-                return;
+                humanWin = true;
             }
-            string bestScoreField = pbState.GetBestScoreField();
-            foreach (Button compField in canBoard.Children)
+        }
+
+        private void Field_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!humanWin)
             {
-                if (compField.Tag.Equals(bestScoreField))
+                Thread.Sleep(500);
+                string bestScoreField = pbState.GetBestScoreField();
+                foreach (Button compField in canBoard.Children)
                 {
-                    coordinates = ((string)compField.Tag).Split(',');
-                    X = int.Parse(coordinates[0]);
-                    Y = int.Parse(coordinates[1]);
-                    win = ProcessingMove(compField, "O", PlayBoardState.computer, X, Y);
-                    if (win)
+                    if (compField.Tag.Equals(bestScoreField))
                     {
-                        AnnounceWin(compField, PlayBoardState.computer);
+                        string[] coordinates = ((string)compField.Tag).Split(',');
+                        int X = int.Parse(coordinates[0]);
+                        int Y = int.Parse(coordinates[1]);
+                        bool win = ProcessingMove(compField, "O", PlayBoardState.computer, X, Y);
+                        if (win)
+                        {
+                            AnnounceWin(compField, PlayBoardState.computer);
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }
+
+        
         private bool ProcessingMove(Button field, string mark, int player, int X, int Y)
         {
             
