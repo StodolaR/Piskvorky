@@ -24,7 +24,6 @@ namespace Piskvorky
         private PlayBoardState pbState;
         private const int fieldSize = 20;
         private Button? lastButton;
-        private bool humanWin = false;
         public PlayBoard()
         {
             InitializeComponent();
@@ -63,30 +62,26 @@ namespace Piskvorky
             if (win)
             {
                 AnnounceWin(humanField, PlayBoardState.human);
-                humanWin = true;
             }
         }
 
         private void Field_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (!humanWin)
+            Thread.Sleep(500);
+            string bestScoreField = pbState.GetBestScoreField();
+            foreach (Button compField in canBoard.Children)
             {
-                Thread.Sleep(500);
-                string bestScoreField = pbState.GetBestScoreField();
-                foreach (Button compField in canBoard.Children)
+                if (compField.Tag.Equals(bestScoreField))
                 {
-                    if (compField.Tag.Equals(bestScoreField))
+                    string[] coordinates = ((string)compField.Tag).Split(',');
+                    int X = int.Parse(coordinates[0]);
+                    int Y = int.Parse(coordinates[1]);
+                    bool win = ProcessingMove(compField, "O", PlayBoardState.computer, X, Y);
+                    if (win)
                     {
-                        string[] coordinates = ((string)compField.Tag).Split(',');
-                        int X = int.Parse(coordinates[0]);
-                        int Y = int.Parse(coordinates[1]);
-                        bool win = ProcessingMove(compField, "O", PlayBoardState.computer, X, Y);
-                        if (win)
-                        {
-                            AnnounceWin(compField, PlayBoardState.computer);
-                        }
-                        break;
+                        AnnounceWin(compField, PlayBoardState.computer);
                     }
+                    break;
                 }
             }
         }

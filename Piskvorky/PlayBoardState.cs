@@ -18,7 +18,7 @@ namespace Piskvorky
         public const int computer = 2;
         public PlayBoardState()
         {
-            PlayBoardFields = new int[15, 15];
+            PlayBoardFields = new int[20, 20];
             PlayboardReset();
             WinnerFields = new List<string>();
             RecalcFields = new List<(int,int)>();
@@ -87,10 +87,20 @@ namespace Piskvorky
                 int fieldScore = 3;
                 for (int direction = 0; direction < 4; direction++)
                 {
-                    int humansInRow = 0;
-                    int computersInRow = 0;
+                    int[] humansInRow = {0,0};
+                    int[] computersInRow = {0,0};
+                    int[] block = {5,5};
                     for (int orientation = -1; orientation <= 1; orientation += 2)
                     {
+                        int orientationOrder;
+                        if (orientation == -1)
+                        {
+                            orientationOrder = 0;
+                        }
+                        else
+                        {
+                            orientationOrder = 1;
+                        }
                         bool humanInRow = true;
                         bool computerInRow = true;
                         for (int shift = 1; shift < 5; shift++)
@@ -101,22 +111,79 @@ namespace Piskvorky
                                 && Y + shiftY >= 0 && Y + shiftY < PlayBoardFields.GetLength(1))
                             {
                                 //podminky
-                                if (PlayBoardFields[X + shiftX, Y + shiftY] == human && humanInRow)
+                                int checkField = (PlayBoardFields[X + shiftX, Y + shiftY]);
+                                if  (checkField== human && humanInRow)
                                 {
-                                    humansInRow++;
+                                    humansInRow[orientationOrder]++;
                                     computerInRow = false;
                                 }
-                                else if (PlayBoardFields[X + shiftX, Y + shiftY] == computer && computerInRow)
+                                else if (checkField == computer && computerInRow)
                                 {
-                                    computersInRow++;
+                                    computersInRow[orientationOrder]++;
                                     humanInRow = false;
                                 }
-                                else break;
+                                else if (checkField > 2)
+                                {
+                                    humanInRow = false;
+                                    computerInRow = false;
+                                }
+                                else
+                                {
+                                    if ((humansInRow[orientationOrder] > 0 && checkField == computer) 
+                                        || (computersInRow[orientationOrder] > 0 && checkField == human))
+                                    {
+                                        block[orientationOrder] = shift;
+                                        break;
+                                    }
+                                }
                             }
-                            else break;
+                            else
+                            {
+                                block[orientationOrder] = shift;
+                                break;
+                            }
                         }
                     }
-                    fieldScore = EvaluateFieldScore(humansInRow, computersInRow, fieldScore);
+                    int humansInRowTotal = humansInRow[0] + humansInRow[1];
+                    int computersInRowTotal = computersInRow[0] + computersInRow[1];
+                    if ((humansInRow[0] == block[0]-1)|| (humansInRow[1] == block[1] - 1))
+                    {
+                        if (humansInRowTotal < 4)
+                            humansInRowTotal--;
+                    }
+                    if ((computersInRow[0] == block[0] - 1) || (computersInRow[1] == block[1] - 1))
+                    {
+                        if (computersInRowTotal < 4)
+                            computersInRowTotal--;
+                    }
+                    if (block[0] + block[1] < 6)
+                    {
+                        humansInRowTotal = 0;
+                        computersInRowTotal = 0;
+                    }
+                    else if (humansInRow[0] > 0 && computersInRow[1] > 0)
+                    {
+                        if (block[0] < 5)
+                        {
+                            humansInRowTotal = 0;
+                        }
+                        if (block[1] < 5)
+                        {
+                            computersInRowTotal = 0;
+                        }
+                    }
+                    else if (computersInRow[0] > 0 && humansInRow[1] > 0)
+                    {
+                        if (block[0] < 5)
+                        {
+                            computersInRowTotal = 0;
+                        }
+                        if (block[1] < 5)
+                        {
+                            humansInRowTotal = 0;
+                        }
+                    }
+                    fieldScore = EvaluateFieldScore(humansInRowTotal, computersInRowTotal, fieldScore);
                 }
                 PlayBoardFields[X,Y] = fieldScore;
             }
@@ -126,17 +193,17 @@ namespace Piskvorky
 
             switch (humansInRow)
             {
-                case 1: fieldScore += 7; break;
-                case 2: fieldScore += 32; break;
-                case 3: fieldScore += 140; break;
-                case 4: fieldScore += 500; break;
+                case 1: fieldScore += 5; break;
+                case 2: fieldScore += 22; break;
+                case 3: fieldScore += 89; break;
+                case 4: fieldScore += 1441; break;
             }
             switch (computersInRow)
             {
-                case 1: fieldScore += 6; break;
-                case 2: fieldScore += 33; break;
-                case 3: fieldScore += 600; break;
-                case 4: fieldScore += 2000; break;
+                case 1: fieldScore += 4; break;
+                case 2: fieldScore += 21; break;
+                case 3: fieldScore += 360; break;
+                case 4: fieldScore += 6000; break;
             }
             return fieldScore;
         }
