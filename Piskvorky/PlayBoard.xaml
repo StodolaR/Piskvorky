@@ -9,5 +9,6 @@
     <Grid>
         <Canvas x:Name="canBoard" />
         <Button x:Name="btnStav" Content="Stav" HorizontalAlignment="Right" VerticalAlignment="Top" Click="btnStav_Click"/>
+        <Button x:Name="btnPlayer" Content="Zmen hrace" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="btnPlayer_Click"/>
     </Grid>
 </UserControl>

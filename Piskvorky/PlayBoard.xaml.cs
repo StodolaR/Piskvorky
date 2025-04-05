@@ -24,6 +24,7 @@ namespace Piskvorky
         private PlayBoardState pbState;
         private const int fieldSize = 20;
         private Button? lastButton;
+        private int switchPlayer = 1;
         public PlayBoard()
         {
             InitializeComponent();
@@ -41,8 +42,9 @@ namespace Piskvorky
                         Height = fieldSize,
                         Width = fieldSize,
                     };
+                    field.Background = Brushes.LightGray;
                     field.PreviewMouseDown += Field_PreviewMouseDown;
-                    //field.PreviewMouseUp += Field_PreviewMouseUp;
+                    field.PreviewMouseUp += Field_PreviewMouseUp;
                     field.Tag = i + "," + j;
                     board.Children.Add(field);
                     Canvas.SetLeft(field, i * fieldSize);
@@ -58,10 +60,10 @@ namespace Piskvorky
             int X = int.Parse(coordinates[0]);
             int Y = int.Parse(coordinates[1]);
             if (!pbState.IsFree(X, Y)) return;
-            bool win = ProcessingMove(humanField, "X", PlayBoardState.human, X, Y);
+            bool win = ProcessingMove(humanField, PlayBoardState.human, X, Y);//  switchPlayer.ToString(), switchPlayer, X, Y);
             if (win)
             {
-                AnnounceWin(humanField, PlayBoardState.human);
+                AnnounceWin(humanField, switchPlayer);
             }
         }
 
@@ -76,7 +78,7 @@ namespace Piskvorky
                     string[] coordinates = ((string)compField.Tag).Split(',');
                     int X = int.Parse(coordinates[0]);
                     int Y = int.Parse(coordinates[1]);
-                    bool win = ProcessingMove(compField, "O", PlayBoardState.computer, X, Y);
+                    bool win = ProcessingMove(compField, PlayBoardState.computer, X, Y);
                     if (win)
                     {
                         AnnounceWin(compField, PlayBoardState.computer);
@@ -85,7 +87,7 @@ namespace Piskvorky
                 }
             }
         }   
-        private bool ProcessingMove(Button field, string mark, int player, int X, int Y)
+        private bool ProcessingMove(Button field, int player, int X, int Y)
         {
             
             field.FontWeight = FontWeights.Bold;
@@ -93,24 +95,40 @@ namespace Piskvorky
             {
                 lastButton.FontWeight = FontWeights.Normal;
             }
-            field.Content = mark;
+            if (player == 1)
+            {
+                field.Foreground = Brushes.Red;
+                field.Content = "X";
+            }
+            else
+            {
+                field.Foreground = Brushes.Blue;
+                field.Content = "O";
+            }
             lastButton = field;
             bool isWin = pbState.EvaluateMove(X, Y, player);
             return isWin;
         }
         private void AnnounceWin(Button field, int player)
         {
-            field.Foreground = Brushes.Red;
+            field.Background = Brushes.Gold;
             foreach (Button button in canBoard.Children)
             {
                 if (pbState.WinnerFields.Contains(button.Tag))
-                    button.Foreground = Brushes.Red;
+                    button.Background = Brushes.Gold;
             }
-            MessageBox.Show($"Vyhrál Hráč{player}");
+            if (player == PlayBoardState.human)
+            {
+                MessageBox.Show("Gratuluji, vyhrál jsi!");
+            }
+            else
+            {
+                MessageBox.Show("Tentokrát byl lepší počítač...");
+            }
             foreach (Button button in canBoard.Children)
             {
                 button.Content = "";
-                button.Foreground = Brushes.Black;
+                button.Background = Brushes.LightGray;
             }
             pbState.PlayboardReset();
         }
@@ -127,6 +145,18 @@ namespace Piskvorky
             }
             string scoreBoard = scoreBoardBuild.ToString();
             MessageBox.Show(scoreBoard);
+        }
+
+        private void btnPlayer_Click(object sender, RoutedEventArgs e)
+        {
+            if (switchPlayer == 1)
+            {
+                switchPlayer = 2;
+            }
+            else
+            {
+                switchPlayer = 1;
+            }
         }
     }
 }
