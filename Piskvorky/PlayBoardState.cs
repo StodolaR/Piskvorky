@@ -90,8 +90,8 @@ namespace Piskvorky
                     int[] humansInRow = {0,0};
                     int[] computersInRow = {0,0};
                     int[] freeInRow = {0,0};
-                    int[] humansInRowAfterFree = {0,0};
-                    int[] computersInRowAfterFree = {0,0};
+                    int[] freeInHumanRow = {0,0};
+                    int[] freeInComputerRow = {0,0};
                     int[] block = {6,6};
                     for (int orientation = -1; orientation <= 1; orientation += 2)
                     {
@@ -117,30 +117,21 @@ namespace Piskvorky
                                 int checkField = (PlayBoardFields[X + shiftX, Y + shiftY]);
                                 if  (checkField== human && humanInRow && shift < 5)
                                 {
-                                    if (freeInRow[orientationOrder] == 0)
+                                    humansInRow[orientationOrder]++;
+                                    computerInRow = false;
+                                    if (freeInRow[orientationOrder] == 1)
                                     {
-                                        humansInRow[orientationOrder]++;
-                                        computerInRow = false;
-                                    }
-                                    else
-                                    {
-                                        humansInRowAfterFree[orientationOrder]++;
-                                        computerInRow = false;
+                                        freeInHumanRow[orientationOrder] = 1;
                                     }
                                 }
                                 else if (checkField == computer && computerInRow && shift < 5)
                                 {
-                                    if (freeInRow[orientationOrder] == 0)
+                                    computersInRow[orientationOrder]++;
+                                    humanInRow = false;
+                                    if (freeInRow[orientationOrder] == 1)
                                     {
-                                        computersInRow[orientationOrder]++;
-                                        humanInRow = false;
+                                        freeInComputerRow[orientationOrder] = 1;
                                     }
-                                    else
-                                    {
-                                        computersInRowAfterFree[orientationOrder]++;
-                                        humanInRow = false;
-                                    }
-                                    
                                 }
                                 else if (checkField > 2)
                                 {
@@ -153,8 +144,7 @@ namespace Piskvorky
                                 }
                                 else
                                 {
-                                    if ((humansInRow[orientationOrder] + humansInRowAfterFree[orientationOrder] > 0 && checkField == computer) 
-                                        || (computersInRow[orientationOrder] + computersInRowAfterFree[orientationOrder] > 0 && checkField == human))
+                                    if ((humansInRow[orientationOrder] > 0 && checkField == computer) || (computersInRow[orientationOrder] > 0 && checkField == human))
                                     {
                                         block[orientationOrder] = shift;
                                         break;
@@ -168,26 +158,10 @@ namespace Piskvorky
                             }
                         }
                     }
-                    int humansInRowTotal = humansInRow[0] + humansInRow[1] + humansInRowAfterFree[0] + humansInRowAfterFree[1];
-                    int computersInRowTotal = computersInRow[0] + computersInRow[1] + computersInRowAfterFree[0] + computersInRowAfterFree[1];
-                    int freeInComputerRows = 0;
-                    int freeInHumanRows = 0;
-                    if (humansInRowAfterFree[0] > 0)
-                    {
-                        freeInHumanRows++;
-                    }
-                    if (computersInRowAfterFree[0] > 0)
-                    {
-                        freeInComputerRows++;
-                    }
-                    if (humansInRowAfterFree[1] > 0)
-                    {
-                        freeInHumanRows++;
-                    }
-                    if (computersInRowAfterFree[1] > 0)
-                    {
-                        freeInComputerRows++;
-                    }               
+                    int humansInRowTotal = humansInRow[0] + humansInRow[1];
+                    int computersInRowTotal = computersInRow[0] + computersInRow[1];
+                    int freeInComputerRows = freeInComputerRow[0] + freeInComputerRow[1];
+                    int freeInHumanRows = freeInHumanRow[0] + freeInHumanRow[1];
                     if ((humansInRow[0] == block[0] - 1) || (humansInRow[1] == block[1] - 1))
                     {
                         if (humansInRowTotal < 4)
@@ -198,14 +172,12 @@ namespace Piskvorky
                         if (computersInRowTotal < 4)
                             computersInRowTotal--;
                     }
-                    if (freeInHumanRows > 0 && (humansInRow[0] + 1 + humansInRowAfterFree[0] == block[0]-1 
-                        || humansInRow[1] + 1 + humansInRowAfterFree[1] == block[1] - 1))
+                    if ((freeInHumanRow[0] == 1 && humansInRow[0] == block[0] - 2) || (freeInHumanRow[1] == 1 && humansInRow[1] == block[1] - 2))
                     {
                         if (humansInRowTotal < 4)
                             humansInRowTotal--;
                     }
-                    if (freeInComputerRows > 0 && (computersInRow[0] + 1 + computersInRowAfterFree[0] == block[0] - 1
-                        || computersInRow[1] + 1 + computersInRowAfterFree[1] == block[1] - 1))
+                    if ((freeInComputerRow[0] == 1 && computersInRow[0] == block[0] - 2) || (freeInComputerRow[1] == 1 && computersInRow[1] == block[1] - 2))
                     {
                         if (computersInRowTotal < 4)
                             computersInRowTotal--;
@@ -215,7 +187,7 @@ namespace Piskvorky
                         humansInRowTotal = 0;
                         computersInRowTotal = 0;
                     }
-                    else if (humansInRow[0] + humansInRowAfterFree[0] > 0 && computersInRow[1] + computersInRowAfterFree[1] > 0)
+                    else if (humansInRow[0] > 0 && computersInRow[1] > 0)
                     {
                         if (block[0] < 5)
                         {
@@ -226,7 +198,7 @@ namespace Piskvorky
                             computersInRowTotal = 0;
                         }
                     }
-                    else if (computersInRow[0] + computersInRowAfterFree[0] > 0 && humansInRow[1] + humansInRowAfterFree[1] > 0)
+                    else if (computersInRow[0] > 0 && humansInRow[1] > 0)
                     {
                         if (block[0] < 5)
                         {
