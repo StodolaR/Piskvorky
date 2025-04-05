@@ -18,7 +18,7 @@ namespace Piskvorky
         public const int computer = 2;
         public PlayBoardState()
         {
-            PlayBoardFields = new int[15, 15];
+            PlayBoardFields = new int[20, 20];
             PlayboardReset();
             WinnerFields = new List<string>();
             RecalcFields = new List<(int,int)>();
@@ -92,7 +92,7 @@ namespace Piskvorky
                     int[] freeInRow = {0,0};
                     int[] humansInRowAfterFree = {0,0};
                     int[] computersInRowAfterFree = {0,0};
-                    int[] block = {5,5};
+                    int[] block = {6,6};
                     for (int orientation = -1; orientation <= 1; orientation += 2)
                     {
                         int orientationOrder;
@@ -106,7 +106,7 @@ namespace Piskvorky
                         }
                         bool humanInRow = true;
                         bool computerInRow = true;
-                        for (int shift = 1; shift < 5; shift++)
+                        for (int shift = 1; shift < 6; shift++)
                         {
                             int shiftX = shift * DirectionCoords[direction, 0] * orientation;
                             int shiftY = shift * DirectionCoords[direction, 1] * orientation;
@@ -219,6 +219,18 @@ namespace Piskvorky
                         if (computersInRowTotal < 4)
                             computersInRowTotal--;
                     }
+                    if (isFreeInHumanRow && (humansInRow[0] + 1 + humansInRowAfterFree[0] == block[0]-1 
+                        || humansInRow[1] + 1 + humansInRowAfterFree[1] == block[1] - 1))
+                    {
+                        if (humansInRowTotal < 4)
+                            humansInRowTotal--;
+                    }
+                    if (isFreeInComputerRow && (computersInRow[0] + 1 + computersInRowAfterFree[0] == block[0] - 1
+                        || computersInRow[1] + 1 + computersInRowAfterFree[1] == block[1] - 1))
+                    {
+                        if (computersInRowTotal < 4)
+                            computersInRowTotal--;
+                    }
                     if (block[0] + block[1] < 6)
                     {
                         humansInRowTotal = 0;
@@ -289,7 +301,7 @@ namespace Piskvorky
                 }
             }
             Random random = new Random();
-            return BestScoreFields[0];          //random.Next(BestScoreFields.Count())];
+            return BestScoreFields[random.Next(BestScoreFields.Count())];
         }
         public void PlayboardReset()
         {
