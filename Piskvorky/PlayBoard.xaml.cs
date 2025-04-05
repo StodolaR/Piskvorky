@@ -42,7 +42,7 @@ namespace Piskvorky
                         Width = fieldSize,
                     };
                     field.PreviewMouseDown += Field_PreviewMouseDown;
-                    field.PreviewMouseUp += Field_PreviewMouseUp;
+                    //field.PreviewMouseUp += Field_PreviewMouseUp;
                     field.Tag = i + "," + j;
                     board.Children.Add(field);
                     Canvas.SetLeft(field, i * fieldSize);
@@ -84,9 +84,7 @@ namespace Piskvorky
                     break;
                 }
             }
-        }
-
-        
+        }   
         private bool ProcessingMove(Button field, string mark, int player, int X, int Y)
         {
             

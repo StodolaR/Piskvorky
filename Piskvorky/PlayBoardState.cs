@@ -115,7 +115,7 @@ namespace Piskvorky
                             {
                                 //podminky
                                 int checkField = (PlayBoardFields[X + shiftX, Y + shiftY]);
-                                if  (checkField== human && humanInRow)
+                                if  (checkField== human && humanInRow && shift < 5)
                                 {
                                     if (freeInRow[orientationOrder] == 0)
                                     {
@@ -128,7 +128,7 @@ namespace Piskvorky
                                         computerInRow = false;
                                     }
                                 }
-                                else if (checkField == computer && computerInRow)
+                                else if (checkField == computer && computerInRow && shift < 5)
                                 {
                                     if (freeInRow[orientationOrder] == 0)
                                     {
@@ -180,14 +180,16 @@ namespace Piskvorky
                     {
                         isFreeInComputerRow = true;
                     }
-                    if (humansInRowTotal > 0 && computersInRowTotal > 0)
+                    int humansTotal = humansInRowTotal + humansInRowAfterFree[0] + humansInRowAfterFree[1];
+                    int computersTotal = computersInRowTotal + computersInRowAfterFree[0] + computersInRowAfterFree[1];
+                    if (humansTotal > 0 && computersTotal > 0)
                     {
                         humansInRowTotal += humansInRowAfterFree[0];
                         computersInRowTotal += computersInRowAfterFree[0];
                         humansInRowTotal += humansInRowAfterFree[1];
                         computersInRowTotal += computersInRowAfterFree[1];
                     }
-                    else if (humansInRowTotal > 0 && computersInRowTotal == 0)
+                    else if (humansTotal  > 0 && computersTotal == 0)
                     {
                         if (humansInRowAfterFree[0] > humansInRowAfterFree[1])
                         {
@@ -198,7 +200,7 @@ namespace Piskvorky
                             humansInRowTotal += humansInRowAfterFree[1];
                         }
                     }
-                    else if (computersInRowTotal > 0 && humansInRowTotal == 0)
+                    else if (computersTotal > 0 && humansTotal == 0)
                     {
                         if (computersInRowAfterFree[0] > computersInRowAfterFree[1])
                         {
@@ -269,16 +271,16 @@ namespace Piskvorky
             switch (humansInRow)
             {
                 case 1: fieldScore += 5; if (isFreeInHumanRow) fieldScore -= 2; break;
-                case 2: fieldScore += 22; if (isFreeInHumanRow) fieldScore -= 11; break;
-                case 3: fieldScore += 89; if (isFreeInHumanRow) fieldScore -= 44; break;
-                case 4: fieldScore += 1441; if (isFreeInHumanRow) fieldScore -= 720; break;
+                case 2: fieldScore += 22; if (isFreeInHumanRow) fieldScore -= 7; break;
+                case 3: fieldScore += 89; if (isFreeInHumanRow) fieldScore -= 30; break;
+                case > 3: fieldScore += 1441; if (isFreeInHumanRow) fieldScore -= 500; break;
             }
             switch (computersInRow)
             {
                 case 1: fieldScore += 4; if (isFreeInComputerRow) fieldScore -= 2; break;
-                case 2: fieldScore += 21; if (isFreeInComputerRow) fieldScore -= 10; break;
-                case 3: fieldScore += 360; if (isFreeInComputerRow) fieldScore -= 180; break;
-                case 4: fieldScore += 6000; if (isFreeInComputerRow) fieldScore += 360-6000; break;
+                case 2: fieldScore += 21; if (isFreeInComputerRow) fieldScore -= 7; break;
+                case 3: fieldScore += 360; if (isFreeInComputerRow) fieldScore -= 120; break;
+                case > 3: fieldScore += 6000; if (isFreeInComputerRow) fieldScore -= 2000; break;
             }
             return fieldScore;
         }
