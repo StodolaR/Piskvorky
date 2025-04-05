@@ -18,7 +18,7 @@ namespace Piskvorky
         public const int computer = 2;
         public PlayBoardState()
         {
-            PlayBoardFields = new int[20, 20];
+            PlayBoardFields = new int[15, 15];
             PlayboardReset();
             WinnerFields = new List<string>();
             RecalcFields = new List<(int,int)>();
@@ -89,6 +89,9 @@ namespace Piskvorky
                 {
                     int[] humansInRow = {0,0};
                     int[] computersInRow = {0,0};
+                    int[] freeInRow = {0,0};
+                    int[] humansInRowAfterFree = {0,0};
+                    int[] computersInRowAfterFree = {0,0};
                     int[] block = {5,5};
                     for (int orientation = -1; orientation <= 1; orientation += 2)
                     {
@@ -114,18 +117,39 @@ namespace Piskvorky
                                 int checkField = (PlayBoardFields[X + shiftX, Y + shiftY]);
                                 if  (checkField== human && humanInRow)
                                 {
-                                    humansInRow[orientationOrder]++;
-                                    computerInRow = false;
+                                    if (freeInRow[orientationOrder] == 0)
+                                    {
+                                        humansInRow[orientationOrder]++;
+                                        computerInRow = false;
+                                    }
+                                    else
+                                    {
+                                        humansInRowAfterFree[orientationOrder]++;
+                                        computerInRow = false;
+                                    }
                                 }
                                 else if (checkField == computer && computerInRow)
                                 {
-                                    computersInRow[orientationOrder]++;
-                                    humanInRow = false;
+                                    if (freeInRow[orientationOrder] == 0)
+                                    {
+                                        computersInRow[orientationOrder]++;
+                                        humanInRow = false;
+                                    }
+                                    else
+                                    {
+                                        computersInRowAfterFree[orientationOrder]++;
+                                        humanInRow = false;
+                                    }
+                                    
                                 }
                                 else if (checkField > 2)
                                 {
-                                    humanInRow = false;
-                                    computerInRow = false;
+                                    freeInRow[orientationOrder]++;
+                                    if (freeInRow[orientationOrder] > 1)
+                                    {
+                                        humanInRow = false;
+                                        computerInRow = false;
+                                    }                                  
                                 }
                                 else
                                 {
@@ -146,7 +170,46 @@ namespace Piskvorky
                     }
                     int humansInRowTotal = humansInRow[0] + humansInRow[1];
                     int computersInRowTotal = computersInRow[0] + computersInRow[1];
-                    if ((humansInRow[0] == block[0]-1)|| (humansInRow[1] == block[1] - 1))
+                    bool isFreeInComputerRow = false;
+                    bool isFreeInHumanRow = false;
+                    if (humansInRowAfterFree[0] + humansInRowAfterFree[1] > 0)
+                    {
+                        isFreeInHumanRow = true;
+                    }
+                    if (computersInRowAfterFree[0] + computersInRowAfterFree[1] > 0)
+                    {
+                        isFreeInComputerRow = true;
+                    }
+                    if (humansInRowTotal > 0 && computersInRowTotal > 0)
+                    {
+                        humansInRowTotal += humansInRowAfterFree[0];
+                        computersInRowTotal += computersInRowAfterFree[0];
+                        humansInRowTotal += humansInRowAfterFree[1];
+                        computersInRowTotal += computersInRowAfterFree[1];
+                    }
+                    else if (humansInRowTotal > 0 && computersInRowTotal == 0)
+                    {
+                        if (humansInRowAfterFree[0] > humansInRowAfterFree[1])
+                        {
+                            humansInRowTotal += humansInRowAfterFree[0];
+                        }
+                        else
+                        {
+                            humansInRowTotal += humansInRowAfterFree[1];
+                        }
+                    }
+                    else if (computersInRowTotal > 0 && humansInRowTotal == 0)
+                    {
+                        if (computersInRowAfterFree[0] > computersInRowAfterFree[1])
+                        {
+                            computersInRowTotal += computersInRowAfterFree[0];
+                        }
+                        else
+                        {
+                            computersInRowTotal += computersInRowAfterFree[1];
+                        }
+                    }
+                    if ((humansInRow[0] == block[0] - 1) || (humansInRow[1] == block[1] - 1))
                     {
                         if (humansInRowTotal < 4)
                             humansInRowTotal--;
@@ -183,27 +246,27 @@ namespace Piskvorky
                             humansInRowTotal = 0;
                         }
                     }
-                    fieldScore = EvaluateFieldScore(humansInRowTotal, computersInRowTotal, fieldScore);
+                    fieldScore = EvaluateFieldScore(humansInRowTotal, computersInRowTotal, fieldScore, isFreeInHumanRow, isFreeInComputerRow);
                 }
                 PlayBoardFields[X,Y] = fieldScore;
             }
         }
-        private int EvaluateFieldScore(int humansInRow,  int computersInRow, int fieldScore)
+        private int EvaluateFieldScore(int humansInRow,  int computersInRow, int fieldScore, bool isFreeInHumanRow, bool isFreeInComputerRow)
         {
 
             switch (humansInRow)
             {
-                case 1: fieldScore += 5; break;
-                case 2: fieldScore += 22; break;
-                case 3: fieldScore += 89; break;
-                case 4: fieldScore += 1441; break;
+                case 1: fieldScore += 5; if (isFreeInHumanRow) fieldScore -= 2; break;
+                case 2: fieldScore += 22; if (isFreeInHumanRow) fieldScore -= 11; break;
+                case 3: fieldScore += 89; if (isFreeInHumanRow) fieldScore -= 44; break;
+                case 4: fieldScore += 1441; if (isFreeInHumanRow) fieldScore -= 720; break;
             }
             switch (computersInRow)
             {
-                case 1: fieldScore += 4; break;
-                case 2: fieldScore += 21; break;
-                case 3: fieldScore += 360; break;
-                case 4: fieldScore += 6000; break;
+                case 1: fieldScore += 4; if (isFreeInComputerRow) fieldScore -= 2; break;
+                case 2: fieldScore += 21; if (isFreeInComputerRow) fieldScore -= 10; break;
+                case 3: fieldScore += 360; if (isFreeInComputerRow) fieldScore -= 180; break;
+                case 4: fieldScore += 6000; if (isFreeInComputerRow) fieldScore += 360-6000; break;
             }
             return fieldScore;
         }
@@ -226,7 +289,7 @@ namespace Piskvorky
                 }
             }
             Random random = new Random();
-            return BestScoreFields[random.Next(BestScoreFields.Count())];
+            return BestScoreFields[0];          //random.Next(BestScoreFields.Count())];
         }
         public void PlayboardReset()
         {
