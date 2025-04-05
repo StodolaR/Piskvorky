@@ -159,49 +159,68 @@ namespace Piskvorky
                     int computersInRowTotal = computersInRow[0] + computersInRow[1];
                     int freeInComputerRows = freeInComputerRow[0] + freeInComputerRow[1];
                     int freeInHumanRows = freeInHumanRow[0] + freeInHumanRow[1];
-                    if ((humansInRow[0] == block[0] - 1) || (humansInRow[1] == block[1] - 1) || 
-                        (freeInHumanRow[0] == 1 && humansInRow[0] == block[0] - 2) || (freeInHumanRow[1] == 1 && humansInRow[1] == block[1] - 2))
-                    {
-                        if (humansInRowTotal < 4)
-                            humansInRowTotal--;
-                    }
-                    if ((computersInRow[0] == block[0] - 1) || (computersInRow[1] == block[1] - 1) || 
-                        (freeInComputerRow[0] == 1 && computersInRow[0] == block[0] - 2) || (freeInComputerRow[1] == 1 && computersInRow[1] == block[1] - 2))
-                    {
-                        if (computersInRowTotal < 4)
-                            computersInRowTotal--;
-                    }                   
-                    if (block[0] + block[1] < 6)
-                    {
-                        humansInRowTotal = 0;
-                        computersInRowTotal = 0;
-                    }
-                    else if (humansInRow[0] > 0 && computersInRow[1] > 0)
-                    {
-                        if (block[0] < 5)
-                        {
-                            humansInRowTotal = 0;
-                        }
-                        if (block[1] < 5)
-                        {
-                            computersInRowTotal = 0;
-                        }
-                    }
-                    else if (computersInRow[0] > 0 && humansInRow[1] > 0)
-                    {
-                        if (block[0] < 5)
-                        {
-                            computersInRowTotal = 0;
-                        }
-                        if (block[1] < 5)
-                        {
-                            humansInRowTotal = 0;
-                        }
-                    }
+                    humansInRowTotal = ReduceHumansIfBlocked(humansInRow, computersInRow, block, freeInHumanRow, humansInRowTotal);
+                    computersInRowTotal = ReduceComputersIfBlocked(humansInRow, computersInRow, block, freeInComputerRow, computersInRowTotal);
                     fieldScore = EvaluateFieldScore(humansInRowTotal, computersInRowTotal, fieldScore, freeInHumanRows, freeInComputerRows);
                 }
                 PlayBoardFields[X,Y] = fieldScore;
             }
+        }
+        private int ReduceHumansIfBlocked(int[] humansInRow, int[] computersInRow, int[] block, int[] freeInHumanRow, int humansInRowTotal)
+        {
+            if ((humansInRow[0] == block[0] - 1) || (humansInRow[1] == block[1] - 1) ||
+               (freeInHumanRow[0] == 1 && humansInRow[0] == block[0] - 2) || (freeInHumanRow[1] == 1 && humansInRow[1] == block[1] - 2))
+            {
+                if (humansInRowTotal < 4)
+                    humansInRowTotal--;
+            }
+            if (block[0] + block[1] < 6)
+            {
+                humansInRowTotal = 0;
+            }
+            else if (humansInRow[0] > 0 && computersInRow[1] > 0)
+            {
+                if (block[0] < 5)
+                {
+                    humansInRowTotal = 0;
+                }
+            }
+            else if (computersInRow[0] > 0 && humansInRow[1] > 0)
+            {
+                if (block[1] < 5)
+                {
+                    humansInRowTotal = 0;
+                }
+            }
+            return humansInRowTotal;
+        }
+        private int ReduceComputersIfBlocked(int[] humansInRow, int[] computersInRow, int[] block, int[] freeInComputerRow, int computersInRowTotal)
+        {
+            if ((computersInRow[0] == block[0] - 1) || (computersInRow[1] == block[1] - 1) ||
+                (freeInComputerRow[0] == 1 && computersInRow[0] == block[0] - 2) || (freeInComputerRow[1] == 1 && computersInRow[1] == block[1] - 2))
+            {
+                if (computersInRowTotal < 4)
+                    computersInRowTotal--;
+            }
+            if (block[0] + block[1] < 6)
+            {
+                computersInRowTotal = 0;
+            }
+            else if (humansInRow[0] > 0 && computersInRow[1] > 0)
+            {
+                if (block[1] < 5)
+                {
+                    computersInRowTotal = 0;
+                }
+            }
+            else if (computersInRow[0] > 0 && humansInRow[1] > 0)
+            {
+                if (block[0] < 5)
+                {
+                    computersInRowTotal = 0;
+                }
+            }
+            return computersInRowTotal;
         }
         private int EvaluateFieldScore(int humansInRow,  int computersInRow, int fieldScore, int freeInHumanRows, int freeInComputerRows)
         {
