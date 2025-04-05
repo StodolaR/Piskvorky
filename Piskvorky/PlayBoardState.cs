@@ -95,15 +95,12 @@ namespace Piskvorky
                     int[] block = {6,6};
                     for (int orientation = -1; orientation <= 1; orientation += 2)
                     {
-                        int orientationOrder;
-                        if (orientation == -1)
+                        int orientationOrder = 0;
+                        switch (orientation)
                         {
-                            orientationOrder = 0;
-                        }
-                        else
-                        {
-                            orientationOrder = 1;
-                        }
+                            case -1: orientationOrder = 0; break;
+                            case 1: orientationOrder = 1; break;
+                        }    
                         bool humanInRow = true;
                         bool computerInRow = true;
                         for (int shift = 1; shift < 6; shift++)
@@ -162,26 +159,18 @@ namespace Piskvorky
                     int computersInRowTotal = computersInRow[0] + computersInRow[1];
                     int freeInComputerRows = freeInComputerRow[0] + freeInComputerRow[1];
                     int freeInHumanRows = freeInHumanRow[0] + freeInHumanRow[1];
-                    if ((humansInRow[0] == block[0] - 1) || (humansInRow[1] == block[1] - 1))
+                    if ((humansInRow[0] == block[0] - 1) || (humansInRow[1] == block[1] - 1) || 
+                        (freeInHumanRow[0] == 1 && humansInRow[0] == block[0] - 2) || (freeInHumanRow[1] == 1 && humansInRow[1] == block[1] - 2))
                     {
                         if (humansInRowTotal < 4)
                             humansInRowTotal--;
                     }
-                    if ((computersInRow[0] == block[0] - 1) || (computersInRow[1] == block[1] - 1))
+                    if ((computersInRow[0] == block[0] - 1) || (computersInRow[1] == block[1] - 1) || 
+                        (freeInComputerRow[0] == 1 && computersInRow[0] == block[0] - 2) || (freeInComputerRow[1] == 1 && computersInRow[1] == block[1] - 2))
                     {
                         if (computersInRowTotal < 4)
                             computersInRowTotal--;
-                    }
-                    if ((freeInHumanRow[0] == 1 && humansInRow[0] == block[0] - 2) || (freeInHumanRow[1] == 1 && humansInRow[1] == block[1] - 2))
-                    {
-                        if (humansInRowTotal < 4)
-                            humansInRowTotal--;
-                    }
-                    if ((freeInComputerRow[0] == 1 && computersInRow[0] == block[0] - 2) || (freeInComputerRow[1] == 1 && computersInRow[1] == block[1] - 2))
-                    {
-                        if (computersInRowTotal < 4)
-                            computersInRowTotal--;
-                    }
+                    }                   
                     if (block[0] + block[1] < 6)
                     {
                         humansInRowTotal = 0;
@@ -252,7 +241,7 @@ namespace Piskvorky
                 }
             }
             Random random = new Random();
-            return BestScoreFields[0];// random.Next(BestScoreFields.Count())];
+            return BestScoreFields[random.Next(BestScoreFields.Count())];
         }
         public void PlayboardReset()
         {
