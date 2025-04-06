@@ -16,6 +16,7 @@ namespace Piskvorky
         public int[,] DirectionCoords { get; set; }
         public const int human = 1;
         public const int computer = 2;
+        public int testScore { get; set; } //smazat
         public PlayBoardState()
         {
             PlayBoardFields = new int[20, 20];
@@ -31,6 +32,7 @@ namespace Piskvorky
         }
         public bool EvaluateMove(int X, int Y, int player)
         {
+            testScore = PlayBoardFields[X, Y]; //smazat
             PlayBoardFields[X, Y] = player;
             bool IsWinner = CheckWin(X,Y,player);
             if (!IsWinner)
@@ -227,17 +229,21 @@ namespace Piskvorky
 
             switch (humansInRow)
             {
-                case 1: fieldScore += 5; fieldScore -= 2 * freeInHumanRows; break;
-                case 2: fieldScore += 22; fieldScore -= 7 * freeInHumanRows; break;
-                case 3: fieldScore += 89; fieldScore -= 30 * freeInHumanRows; break;
-                case > 3: fieldScore += 1441; fieldScore -= 500 * freeInHumanRows; break;
+                case 1: fieldScore += 4 - 1 * freeInHumanRows; break;
+                case 2: fieldScore += 15 - 4 * freeInHumanRows; break;
+                case 3: fieldScore += 60 - 30 * freeInHumanRows; break;
+                case > 3: fieldScore += 960; 
+                    if (freeInHumanRows > 0) fieldScore -= 930; 
+                    break;
             }
             switch (computersInRow)
             {
-                case 1: fieldScore += 4; fieldScore -= 2 * freeInComputerRows; break;
-                case 2: fieldScore += 21; fieldScore -= 7 * freeInComputerRows; break;
-                case 3: fieldScore += 360; fieldScore -= 120 * freeInComputerRows; break;
-                case > 3: fieldScore += 6000; fieldScore -= 2000 * freeInComputerRows; break;
+                case 1: fieldScore += 5 - 1 * freeInComputerRows; break;
+                case 2: fieldScore += 16 - 4 * freeInComputerRows; break;
+                case 3: fieldScore += 240 - 120 * freeInComputerRows; break;
+                case > 3: fieldScore += 3840; 
+                    if (freeInComputerRows > 0) fieldScore -= 3720; 
+                    break;
             }
             return fieldScore;
         }

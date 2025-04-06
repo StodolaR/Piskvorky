@@ -60,7 +60,7 @@ namespace Piskvorky
             int X = int.Parse(coordinates[0]);
             int Y = int.Parse(coordinates[1]);
             if (!pbState.IsFree(X, Y)) return;
-            bool win = ProcessingMove(humanField, PlayBoardState.human, X, Y);//  switchPlayer.ToString(), switchPlayer, X, Y);
+            bool win = ProcessingMove(humanField, PlayBoardState.human, X, Y);// switchPlayer, X, Y);
             if (win)
             {
                 AnnounceWin(humanField, switchPlayer);
@@ -79,6 +79,7 @@ namespace Piskvorky
                     int X = int.Parse(coordinates[0]);
                     int Y = int.Parse(coordinates[1]);
                     bool win = ProcessingMove(compField, PlayBoardState.computer, X, Y);
+                    tbTest.Text = pbState.testScore.ToString();
                     if (win)
                     {
                         AnnounceWin(compField, PlayBoardState.computer);
