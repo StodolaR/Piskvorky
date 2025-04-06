@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Piskvorky"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500" Width="800">
+        Title="MainWindow" Height="560" Width="460">
     <Grid>
-        <local:PlayBoard Margin="20"/>
+        <TextBlock Text="PIŠKVORKY" FontSize="40"  Foreground="DarkGoldenrod" Margin="40,20" FontFamily="Showcard Gothic"/>
+        <local:PlayBoard Margin="20,0"/>
     </Grid>
 </Window>

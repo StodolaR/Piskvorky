@@ -24,7 +24,9 @@ namespace Piskvorky
         private PlayBoardState pbState;
         private const int fieldSize = 20;
         private Button? lastButton;
-        private int switchPlayer = 1;
+        private int scoreHuman = 0;
+        private int scoreComputer = 0;
+        private bool isFree = true;
         public PlayBoard()
         {
             InitializeComponent();
@@ -52,24 +54,31 @@ namespace Piskvorky
                 }
             }
         }
-
         private void Field_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             Button humanField = (Button)sender;
             string[] coordinates = ((string)humanField.Tag).Split(',');
             int X = int.Parse(coordinates[0]);
             int Y = int.Parse(coordinates[1]);
-            if (!pbState.IsFree(X, Y)) return;
-            bool win = ProcessingMove(humanField, PlayBoardState.human, X, Y);// switchPlayer, X, Y);
+            if (!pbState.IsFree(X, Y))
+            {
+                isFree = false;
+                return;
+            }            
+            bool win = ProcessingMove(humanField, PlayBoardState.human, X, Y);
             if (win)
             {
-                AnnounceWin(humanField, switchPlayer);
+                AnnounceWin(humanField, PlayBoardState.human);
             }
         }
-
         private void Field_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
-            Thread.Sleep(500);
+            if (isFree == false)
+            {
+                isFree = true;
+                return;
+            }
+            Thread.Sleep(200);
             string bestScoreField = pbState.GetBestScoreField();
             foreach (Button compField in canBoard.Children)
             {
@@ -79,7 +88,6 @@ namespace Piskvorky
                     int X = int.Parse(coordinates[0]);
                     int Y = int.Parse(coordinates[1]);
                     bool win = ProcessingMove(compField, PlayBoardState.computer, X, Y);
-                    tbTest.Text = pbState.testScore.ToString();
                     if (win)
                     {
                         AnnounceWin(compField, PlayBoardState.computer);
@@ -98,12 +106,12 @@ namespace Piskvorky
             }
             if (player == 1)
             {
-                field.Foreground = Brushes.Red;
+                field.Foreground = Brushes.DarkRed;
                 field.Content = "X";
             }
             else
             {
-                field.Foreground = Brushes.Blue;
+                field.Foreground = Brushes.DarkBlue;
                 field.Content = "O";
             }
             lastButton = field;
@@ -120,10 +128,14 @@ namespace Piskvorky
             }
             if (player == PlayBoardState.human)
             {
+                scoreHuman++;
+                tbScoreHuman.Text = scoreHuman.ToString(); 
                 MessageBox.Show("Gratuluji, vyhrál jsi!");
             }
             else
             {
+                scoreComputer++;
+                tbScoreComputer.Text = scoreComputer.ToString();
                 MessageBox.Show("Tentokrát byl lepší počítač...");
             }
             foreach (Button button in canBoard.Children)
@@ -132,32 +144,6 @@ namespace Piskvorky
                 button.Background = Brushes.LightGray;
             }
             pbState.PlayboardReset();
-        }
-        private void btnStav_Click(object sender, RoutedEventArgs e)
-        {
-            StringBuilder scoreBoardBuild = new StringBuilder(); 
-            for (int j = 0; j < pbState.PlayBoardFields.GetLength(1); j++)
-            {
-                for (int i = 0; i < pbState.PlayBoardFields.GetLength(0); i++)
-                {
-                    scoreBoardBuild.AppendFormat("{0,5}", pbState.PlayBoardFields[i,j]);
-                }
-                scoreBoardBuild.Append(Environment.NewLine);
-            }
-            string scoreBoard = scoreBoardBuild.ToString();
-            MessageBox.Show(scoreBoard);
-        }
-
-        private void btnPlayer_Click(object sender, RoutedEventArgs e)
-        {
-            if (switchPlayer == 1)
-            {
-                switchPlayer = 2;
-            }
-            else
-            {
-                switchPlayer = 1;
-            }
         }
     }
 }

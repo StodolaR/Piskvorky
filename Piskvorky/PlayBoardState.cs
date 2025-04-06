@@ -16,7 +16,6 @@ namespace Piskvorky
         public int[,] DirectionCoords { get; set; }
         public const int human = 1;
         public const int computer = 2;
-        public int testScore { get; set; } //smazat
         public PlayBoardState()
         {
             PlayBoardFields = new int[20, 20];
@@ -32,7 +31,6 @@ namespace Piskvorky
         }
         public bool EvaluateMove(int X, int Y, int player)
         {
-            testScore = PlayBoardFields[X, Y]; //smazat
             PlayBoardFields[X, Y] = player;
             bool IsWinner = CheckWin(X,Y,player);
             if (!IsWinner)
@@ -112,7 +110,6 @@ namespace Piskvorky
                             if (X + shiftX >= 0 && X + shiftX < PlayBoardFields.GetLength(0)
                                 && Y + shiftY >= 0 && Y + shiftY < PlayBoardFields.GetLength(1))
                             {
-                                //podminky
                                 int checkField = (PlayBoardFields[X + shiftX, Y + shiftY]);
                                 if  (checkField== human && humanInRow && shift < 5)
                                 {
