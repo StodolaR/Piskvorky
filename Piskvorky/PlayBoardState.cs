@@ -132,6 +132,10 @@ namespace Piskvorky
                                 else if (checkField > 2)
                                 {
                                     freeInRow[orientationOrder]++;
+                                    if (computersInRow[orientationOrder] > 1 || humansInRow[orientationOrder] > 1)
+                                    {
+                                        freeInRow[orientationOrder]++;
+                                    }
                                     if (freeInRow[orientationOrder] > 1)
                                     {
                                         humanInRow = false;
@@ -223,24 +227,26 @@ namespace Piskvorky
         }
         private int EvaluateFieldScore(int humansInRow,  int computersInRow, int fieldScore, int freeInHumanRows, int freeInComputerRows)
         {
-
-            switch (humansInRow)
+            switch (humansInRow) 
             {
                 case 1: fieldScore += 4 - 1 * freeInHumanRows; break;
                 case 2: fieldScore += 15 - 4 * freeInHumanRows; break;
-                case 3: fieldScore += 60 - 30 * freeInHumanRows; break;
-                case > 3: fieldScore += 960; 
-                    if (freeInHumanRows > 0) fieldScore -= 930; 
-                    break;
+                case 3: fieldScore += 240 - 80 * freeInHumanRows; break;
+                case > 3:fieldScore += 3840;
+                         if (freeInHumanRows > 0) fieldScore -= 3600;
+                         break;
             }
             switch (computersInRow)
             {
                 case 1: fieldScore += 5 - 1 * freeInComputerRows; break;
-                case 2: fieldScore += 16 - 4 * freeInComputerRows; break;
-                case 3: fieldScore += 240 - 120 * freeInComputerRows; break;
-                case > 3: fieldScore += 3840; 
-                    if (freeInComputerRows > 0) fieldScore -= 3720; 
-                    break;
+                case 2:fieldScore += 60;
+                       if (freeInComputerRows == 1) fieldScore -= 5;
+                       if (freeInComputerRows == 2) fieldScore -= 50;
+                       break;
+                case 3: fieldScore += 960 - 320 * freeInComputerRows; break;
+                case > 3:fieldScore += 16000;
+                         if (freeInComputerRows > 0) fieldScore -= 15040;
+                         break;
             }
             return fieldScore;
         }
