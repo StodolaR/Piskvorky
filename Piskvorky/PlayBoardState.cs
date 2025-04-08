@@ -12,7 +12,7 @@ namespace Piskvorky
         public int[,] PlayBoardFields { get; set; }
         public List<string> WinnerFields { get; set; }
         public List<(int, int)> RecalcFields { get; set; }
-        public List<string> BestScoreFields { get; set; }
+        public List<(int,int)> BestScoreFields { get; set; }
         public int[,] DirectionCoords { get; set; }
         public const int human = 1;
         public const int computer = 2;
@@ -22,7 +22,7 @@ namespace Piskvorky
             PlayboardReset();
             WinnerFields = new List<string>();
             RecalcFields = new List<(int,int)>();
-            BestScoreFields = new List<string>();
+            BestScoreFields = new List<(int,int)>();
             DirectionCoords = new int[4, 2] { {-1,0}, {-1,-1}, {0,-1},{1,-1} };
         }
         public bool IsFree(int X, int Y)
@@ -250,7 +250,7 @@ namespace Piskvorky
             }
             return fieldScore;
         }
-        public string GetBestScoreField()
+        public (int,int) GetBestScoreField()
         {
             int max = 4;
             for (int j = 0; j < PlayBoardFields.GetLength(1); j++)
@@ -264,7 +264,7 @@ namespace Piskvorky
                     }
                     if (PlayBoardFields[i, j] == max)
                     {
-                        BestScoreFields.Add(i.ToString() + "," + j.ToString());
+                        BestScoreFields.Add((i,j));
                     }
                 }
             }

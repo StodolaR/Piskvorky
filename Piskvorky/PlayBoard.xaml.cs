@@ -21,6 +21,7 @@ namespace Piskvorky
     /// </summary>
     public partial class PlayBoard : UserControl
     {
+        private Button[,] fieldButtons;
         private PlayBoardState pbState;
         private const int fieldSize = 20;
         private Button? lastButton;
@@ -31,6 +32,7 @@ namespace Piskvorky
         {
             InitializeComponent();
             pbState = new PlayBoardState();
+            fieldButtons = new Button[pbState.PlayBoardFields.GetLength(0), pbState.PlayBoardFields.GetLength(1)];
             InsertFields(canBoard);
         }
         private void InsertFields(Canvas board)
@@ -51,6 +53,7 @@ namespace Piskvorky
                     board.Children.Add(field);
                     Canvas.SetLeft(field, i * fieldSize);
                     Canvas.SetTop(field, j * fieldSize);
+                    fieldButtons[i,j] = field;
                 }
             }
         }
@@ -79,23 +82,16 @@ namespace Piskvorky
                 return;
             }
             Thread.Sleep(200);
-            string bestScoreField = pbState.GetBestScoreField();
-            foreach (Button compField in canBoard.Children)
+            (int,int) bestScoreField = pbState.GetBestScoreField();
+            int X = bestScoreField.Item1;
+            int Y = bestScoreField.Item2;
+            Button compField = fieldButtons[X,Y];
+            bool win = ProcessingMove(compField, PlayBoardState.computer, X, Y);
+            if (win)
             {
-                if (compField.Tag.Equals(bestScoreField))
-                {
-                    string[] coordinates = ((string)compField.Tag).Split(',');
-                    int X = int.Parse(coordinates[0]);
-                    int Y = int.Parse(coordinates[1]);
-                    bool win = ProcessingMove(compField, PlayBoardState.computer, X, Y);
-                    if (win)
-                    {
-                        AnnounceWin(compField, PlayBoardState.computer);
-                    }
-                    break;
-                }
+                AnnounceWin(compField, PlayBoardState.computer);
             }
-        }   
+        }
         private bool ProcessingMove(Button field, int player, int X, int Y)
         {
             
