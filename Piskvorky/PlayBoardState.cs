@@ -10,7 +10,7 @@ namespace Piskvorky
     internal class PlayBoardState
     { 
         public int[,] PlayBoardFields { get; set; }
-        public List<string> WinnerFields { get; set; }
+        public List<(int,int)> WinnerFields { get; set; }
         public List<(int, int)> RecalcFields { get; set; }
         public List<(int,int)> BestScoreFields { get; set; }
         public int[,] DirectionCoords { get; set; }
@@ -20,7 +20,7 @@ namespace Piskvorky
         {
             PlayBoardFields = new int[20, 20];
             PlayboardReset();
-            WinnerFields = new List<string>();
+            WinnerFields = new List<(int,int)>();
             RecalcFields = new List<(int,int)>();
             BestScoreFields = new List<(int,int)>();
             DirectionCoords = new int[4, 2] { {-1,0}, {-1,-1}, {0,-1},{1,-1} };
@@ -59,7 +59,7 @@ namespace Piskvorky
                             if (PlayBoardFields[X + shiftX, Y + shiftY] == player && isInRow == true)
                             {
                                 charsInRow++;
-                                WinnerFields.Add((X + shiftX).ToString() + "," + (Y + shiftY).ToString());
+                                WinnerFields.Add((X + shiftX,Y + shiftY));
                             }
                             else
                             {

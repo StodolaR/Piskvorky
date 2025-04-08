@@ -117,10 +117,11 @@ namespace Piskvorky
         private void AnnounceWin(Button field, int player)
         {
             field.Background = Brushes.Gold;
-            foreach (Button button in canBoard.Children)
+            foreach (var winnerField in pbState.WinnerFields)
             {
-                if (pbState.WinnerFields.Contains(button.Tag))
-                    button.Background = Brushes.Gold;
+                int X = winnerField.Item1;
+                int Y = winnerField.Item2;
+                fieldButtons[X,Y].Background = Brushes.Gold;
             }
             if (player == PlayBoardState.human)
             {
