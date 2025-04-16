@@ -14,6 +14,7 @@ namespace Piskvorky
         public List<(int, int)> RecalcFields { get; set; }
         public List<(int,int)> BestScoreFields { get; set; }
         public int[,] DirectionCoords { get; set; }
+        private Random random;
         public const int human = 1;
         public const int computer = 2;
         public PlayBoardState()
@@ -24,6 +25,7 @@ namespace Piskvorky
             RecalcFields = new List<(int,int)>();
             BestScoreFields = new List<(int,int)>();
             DirectionCoords = new int[4, 2] { {-1,0}, {-1,-1}, {0,-1},{1,-1} };
+            random = new Random();
         }
         public bool IsFree(int X, int Y)
         {
@@ -268,7 +270,6 @@ namespace Piskvorky
                     }
                 }
             }
-            Random random = new Random();
             return BestScoreFields[random.Next(BestScoreFields.Count())];
         }
         public void PlayboardReset()
