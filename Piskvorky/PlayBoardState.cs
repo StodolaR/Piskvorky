@@ -270,6 +270,10 @@ namespace Piskvorky
                     }
                 }
             }
+            if (BestScoreFields.Count == 0)
+            {
+                BestScoreFields.Add((PlayBoardFields.GetLength(0)/2, PlayBoardFields.GetLength(1)/2));
+            }
             return BestScoreFields[random.Next(BestScoreFields.Count())];
         }
         public void PlayboardReset()
