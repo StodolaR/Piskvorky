@@ -21,9 +21,9 @@ namespace Piskvorky
         {
             PlayBoardFields = new int[20, 20];
             PlayboardReset();
-            WinnerFields = new List<(int,int)>();
-            RecalcFields = new List<(int,int)>();
-            BestScoreFields = new List<(int,int)>();
+            WinnerFields = new List<(int, int)>();
+            RecalcFields = new List<(int, int)>();
+            BestScoreFields = new List<(int, int)>();
             DirectionCoords = new int[4, 2] { {-1,0}, {-1,-1}, {0,-1},{1,-1} };
             random = new Random();
         }
@@ -254,6 +254,7 @@ namespace Piskvorky
         }
         public (int,int) GetBestScoreField()
         {
+            BestScoreFields.Clear();
             int max = 4;
             for (int j = 0; j < PlayBoardFields.GetLength(1); j++)
             {
